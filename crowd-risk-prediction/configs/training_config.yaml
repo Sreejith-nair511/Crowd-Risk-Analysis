@@ -1,0 +1,70 @@
+# Training configuration for CIRI model
+
+training:
+  epochs: 100              # Number of training epochs
+  batch_size: 4            # Batch size for training
+  learning_rate: 0.0001    # Initial learning rate
+  weight_decay: 0.00001    # Weight decay for optimizer
+  gradient_clip: 1.0       # Gradient clipping value
+  
+  # Learning rate scheduling
+  lr_scheduler:
+    type: "ReduceLROnPlateau"  # Type of learning rate scheduler
+    patience: 10              # Patience for scheduler
+    factor: 0.5              # Factor by which to reduce LR
+    min_lr: 1.0e-06         # Minimum learning rate
+  
+  # Loss function weights
+  loss:
+    future_weight: 0.5      # Weight for future risk prediction loss
+    current_weight: 0.5     # Weight for current risk prediction loss
+    stability_margin: 0.1   # Margin for stability loss
+
+  # Training data configuration
+  data:
+    train_split: 0.7        # Proportion of data for training
+    val_split: 0.15         # Proportion of data for validation
+    test_split: 0.15        # Proportion of data for testing
+    sequence_length: 8      # Length of temporal sequences
+    augmentations:          # Data augmentation options
+      flip_prob: 0.5        # Probability of horizontal flipping
+      rotate_prob: 0.2      # Probability of rotation
+      noise_prob: 0.3       # Probability of adding noise
+      brightness_range: [-0.1, 0.1]  # Range for brightness adjustment
+
+  # Model saving and logging
+  logging:
+    log_interval: 10        # Interval (batches) to log training info
+    checkpoint_interval: 5  # Interval (epochs) to save checkpoints
+    save_best_only: true    # Only save best model based on validation loss
+    early_stopping:
+      enabled: true         # Enable early stopping
+      patience: 20          # Patience for early stopping
+      min_delta: 0.001     # Minimum change to qualify as improvement
+
+  # Hardware configuration
+  hardware:
+    num_workers: 4          # Number of workers for data loading
+    pin_memory: true        # Pin memory for faster GPU transfer
+    mixed_precision: false  # Use mixed precision training (requires compatible GPU)
+
+# Validation configuration
+validation:
+  batch_size: 8            # Batch size for validation
+  metrics:                 # Metrics to calculate during validation
+    - "auc_roc"
+    - "auc_pr"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "false_alarm_rate"
+    - "mae"
+    - "mse"
+    - "correlation"
+
+# Testing configuration
+testing:
+  batch_size: 8            # Batch size for testing
+  evaluate_on_test_set: true  # Whether to run final evaluation on test set
+  generate_plots: true     # Generate evaluation plots
+  save_predictions: true   # Save predictions for further analysis

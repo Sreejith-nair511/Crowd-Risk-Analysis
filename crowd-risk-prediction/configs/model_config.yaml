@@ -1,0 +1,48 @@
+# Model configuration for Crowd Instability Risk Index (CIRI)
+
+model:
+  csrnet:
+    pretrained: true
+    device: "cuda"
+    input_size: [640, 480]  # Expected input size for CSRNet
+    
+  transformer:
+    input_channels: 6        # Number of input feature channels (density, entropy, foi, lmcs, density_grad, accel_spikes)
+    patch_size: 16          # Size of patches for transformer
+    embed_dim: 256          # Embedding dimension
+    num_heads: 8            # Number of attention heads
+    num_layers: 6           # Number of transformer layers
+    ff_dim: 512             # Feed-forward dimension
+    seq_length: 8           # Length of temporal sequence to process
+    output_size: 1          # Output size for risk prediction
+    dropout: 0.1           # Dropout rate
+    
+  ciri:
+    num_features: 6         # Number of features in CIRI calculation
+    use_mlp_weights: true  # Whether to use MLP for feature combination
+    mlp_hidden_size: 32    # Hidden size for CIRI MLP
+    manual_weights: null    # Manual weights for CIRI calculation (null to learn automatically)
+
+# Feature extraction parameters
+features:
+  optical_flow:
+    method: "farneback"     # Method to use: "farneback" or "raft"
+    window_size: 32         # Window size for local analysis
+    
+  instability:
+    entropy_bins: 16        # Number of bins for directional entropy calculation
+    foi_window_size: 32     # Window size for Flow Opposition Index calculation
+    compression_alpha: 0.7  # Weight for combining density and velocity in LMCS
+
+# Performance parameters
+performance:
+  target_fps: 10           # Target frames per second for real-time processing
+  max_batch_size: 4        # Maximum batch size for inference
+  gpu_memory_limit: "12GB" # Maximum GPU memory to use
+  inference_threads: 4     # Number of threads for inference
+
+# Visualization parameters
+visualization:
+  heatmap_opacity: 0.6     # Opacity of risk heatmap overlay
+  colormap: "jet"          # Colormap for heatmap visualization
+  show_legend: true        # Whether to show legend on heatmap
